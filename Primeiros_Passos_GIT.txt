@@ -1,0 +1,3 @@
+Nessa atividade exploraremos os primeiros do compartilhamento com o GIT.
+Vamos começar com cada um de vocês abrindo uma nova branch a partir do Dev e editando 
+esse arquivo aqui colocando uma nova linha com seu nome.
