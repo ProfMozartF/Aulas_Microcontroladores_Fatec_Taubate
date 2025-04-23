@@ -1,0 +1,9 @@
+../Core/Src/LCD16X2.c:19:6:LCD16X2_DATA	16	static
+../Core/Src/LCD16X2.c:39:6:LCD16X2_CMD	40	static
+../Core/Src/LCD16X2.c:54:6:LCD16X2_Clear	32	static
+../Core/Src/LCD16X2.c:61:6:LCD16X2_Set_Cursor	24	static
+../Core/Src/LCD16X2.c:82:6:LCD16X2_Init	64	static
+../Core/Src/LCD16X2.c:110:6:LCD16X2_Write_Char	72	static
+../Core/Src/LCD16X2.c:135:6:LCD16X2_Write_String	24	static
+../Core/Src/LCD16X2.c:144:6:LCD16X2_SL	16	static
+../Core/Src/LCD16X2.c:150:6:LCD16X2_SR	16	static
