@@ -1,0 +1,17 @@
+#include <stdio.h>
+float volt = 1.56;
+float temp =0.00;
+float temp2 =0.00;
+
+int main()
+{
+    //y = -2,6528x5 + 27,746x4 - 111,37x3 + 217,13x2 - 232,88x + 158,73
+    //y = 10,636x2 - 70,447x + 122,46
+    
+    temp = (-2.65*(volt*volt*volt*volt*volt))+(27.74*(volt*volt*volt*volt))-(111.37*(volt*volt*volt))+(217.13*(volt*volt))-(232.88*volt)+(158.73);
+    temp2 = (10.636*(volt*volt))-(70.44*volt)+122.46;
+    printf("TEMP 5 ORDEM= %.2f\n", temp);
+    printf("TEMP 2 ORDEM= %.2f", temp2);
+
+    return 0;
+}
