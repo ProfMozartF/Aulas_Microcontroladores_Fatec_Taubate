@@ -1,0 +1,8 @@
+../Core/Src/number2string.c:14:13:ReverseStr	2
+../Core/Src/number2string.c:28:9:IntToStr	7
+../Core/Src/number2string.c:65:9:UintToStr	4
+../Core/Src/number2string.c:91:9:FloatToStr	7
+../Core/Src/number2string.c:148:9:FormatInt	6
+../Core/Src/number2string.c:186:6:PadZeros	4
+../Core/Src/number2string.c:203:6:RightAlign	4
+../Core/Src/number2string.c:220:6:CenterAlign	5
