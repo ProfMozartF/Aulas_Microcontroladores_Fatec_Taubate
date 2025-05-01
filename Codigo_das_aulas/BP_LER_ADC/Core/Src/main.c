@@ -18,24 +18,59 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stm32f1xx_hal.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 #include "LCD16X2.h"
 #include "stdio.h"
 #include "string.h"
 #include "number2string.h"
-#define MyLCD LCD16X2_1
+/* USER CODE END Includes */
 
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+#define MyLCD LCD16X2_1
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
+uint16_t volt_raw;
+float voltSensor;
+float TempSensor;
 char buffer[20];
+/* USER CODE BEGIN PV */
 
+/* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
+//uint32_t BP_Read_ADC(uint32_t channel);
+float calcularTemperatura(float volt);
+/* USER CODE BEGIN PFP */
 
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
 
@@ -47,7 +82,7 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-  //HAL_ADC_Init(&hadc1) ;
+
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -62,43 +97,47 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
+  /* USER CODE BEGIN 2 */
+  //Inicia o LCD
   LCD16X2_Init(MyLCD);
   LCD16X2_Clear(MyLCD);
   LCD16X2_Set_Cursor(MyLCD, 1, 1);
   LCD16X2_Write_String(MyLCD, "PROF Mozart");
-
-  // Variável para armazenar o valor convertido
-   uint16_t valorADC;
-
-   HAL_ADC_Stop(&hadc1);
-   HAL_ADCEx_Calibration_Start(&hadc1);
-
-
+  HAL_Delay(2000);
+  /* USER CODE END 2 */
+  HAL_ADCEx_Calibration_Start(&hadc1);
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    /* USER CODE END WHILE */
+
+	    HAL_ADC_Start(&hadc1);
+	    HAL_ADC_PollForConversion(&hadc1, 100);
+	    volt_raw = HAL_ADC_GetValue(&hadc1);
+	    HAL_ADC_Stop(&hadc1);
+
+	  voltSensor = volt_raw*(3.3/4095); // retorna variação 0 a 3.3 volts
+	  TempSensor = calcularTemperatura(voltSensor);
 
 
-	  	     HAL_Delay(500);
+	  LCD16X2_Clear(MyLCD);
+	  LCD16X2_Set_Cursor(MyLCD, 1, 1);
+	  LCD16X2_Write_String(MyLCD, "VOLT = ");
+	  FloatToStr(voltSensor, buffer, 2);
+	  LCD16X2_Set_Cursor(MyLCD, 1, 8);
+
+	  LCD16X2_Set_Cursor(MyLCD, 2, 1);
+	  LCD16X2_Write_String(MyLCD, "TEMP = ");
+	  FloatToStr(TempSensor, buffer, 2);
+	  LCD16X2_Set_Cursor(MyLCD, 2, 8);
 
 
-	  	    HAL_ADC_Start( &hadc1); // Inicia a conversão ADC
-	  	    HAL_ADC_PollForConversion(&hadc1, 10);// Espera a conversão ser concluída
-	  	    valorADC = HAL_ADC_GetValue(&hadc1);// Lê o valor convertido - Devolve um numero entre 0 e 4096
-	  	    HAL_ADC_Stop(&hadc1);
-
-	  	    		   LCD16X2_Clear(MyLCD);
-	  		  	      LCD16X2_Set_Cursor(MyLCD, 1, 1);
-	  		  	      LCD16X2_Write_String(MyLCD, "ADC = ");
-	  		  	      IntToStr(valorADC, buffer, 10);
-	  		  	      LCD16X2_Set_Cursor(MyLCD, 1, 7);
-	  		  	      LCD16X2_Write_String(MyLCD, buffer);
-
-
+	  HAL_Delay(200);
+    /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
-}
+}//FIM DO MAIN
 
 /**
   * @brief System Clock Configuration
@@ -173,17 +212,41 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion = 1;
-  HAL_ADC_Init(&hadc1);
-
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
   /** Configure Regular Channel
   */
-  sConfig.Channel = ADC_CHANNEL_1;
+  sConfig.Channel = ADC_CHANNEL_0;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
- HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+  sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN ADC1_Init 2 */
+  uint32_t BP_Read_ADC(uint32_t channel)
+  {
+    uint32_t result;
+    ADC_ChannelConfTypeDef sConfig;
 
+    sConfig.Channel = channel;
+    sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES_5;
+    sConfig.Rank = ADC_REGULAR_RANK_1;
+
+    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+
+    HAL_ADCEx_Calibration_Start(&hadc1);
+
+    HAL_ADC_Start(&hadc1);
+    HAL_ADC_PollForConversion(&hadc1, 100);
+    result = HAL_ADC_GetValue(&hadc1);
+    HAL_ADC_Stop(&hadc1);
+
+    return result;
+  }
   /* USER CODE END ADC1_Init 2 */
 
 }
@@ -235,7 +298,21 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+float calcularTemperatura(float volt) {
+    float volt2 = volt * volt;
+    float volt3 = volt2 * volt;
+    float volt4 = volt3 * volt;
+    float volt5 = volt4 * volt;
 
+    float temperatura;
+    temperatura = -7.0343 * volt5
+                + 62.113 * volt4
+                - 211.03 * volt3
+                + 344.26 * volt2
+                - 303.17 * volt
+                + 160.71;
+    return temperatura;
+}
 /* USER CODE END 4 */
 
 /**
