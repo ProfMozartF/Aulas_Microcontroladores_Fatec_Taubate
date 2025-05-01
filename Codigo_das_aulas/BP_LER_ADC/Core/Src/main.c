@@ -113,7 +113,7 @@ int main(void)
     /* USER CODE END WHILE */
 
 	    HAL_ADC_Start(&hadc1);
-	    HAL_ADC_PollForConversion(&hadc1, 100);
+	    HAL_ADC_PollForConversion(&hadc1, 10);
 	    volt_raw = HAL_ADC_GetValue(&hadc1);
 	    HAL_ADC_Stop(&hadc1);
 
@@ -126,14 +126,16 @@ int main(void)
 	  LCD16X2_Write_String(MyLCD, "VOLT = ");
 	  FloatToStr(voltSensor, buffer, 2);
 	  LCD16X2_Set_Cursor(MyLCD, 1, 8);
+	  LCD16X2_Write_String(MyLCD, buffer);
 
 	  LCD16X2_Set_Cursor(MyLCD, 2, 1);
 	  LCD16X2_Write_String(MyLCD, "TEMP = ");
 	  FloatToStr(TempSensor, buffer, 2);
 	  LCD16X2_Set_Cursor(MyLCD, 2, 8);
+	  LCD16X2_Write_String(MyLCD, buffer);
 
 
-	  HAL_Delay(200);
+	  HAL_Delay(500);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
