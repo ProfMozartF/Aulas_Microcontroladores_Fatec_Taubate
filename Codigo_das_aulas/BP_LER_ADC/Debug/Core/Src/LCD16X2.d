@@ -23,6 +23,7 @@ Core/Src/LCD16X2.o: ../Core/Src/LCD16X2.c ../Core/Inc/LCD16X2_cfg.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
+ ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
  ../Core/Inc/LCD16X2.h ../Core/Inc/LCD16X2.h ../Core/Inc/Util.h
 ../Core/Inc/LCD16X2_cfg.h:
 ../Core/Inc/main.h:
@@ -50,6 +51,7 @@ Core/Src/LCD16X2.o: ../Core/Src/LCD16X2.c ../Core/Inc/LCD16X2_cfg.h \
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h:
+../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h:
 ../Core/Inc/LCD16X2.h:
 ../Core/Inc/LCD16X2.h:
 ../Core/Inc/Util.h:

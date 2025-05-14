@@ -18,18 +18,16 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-#include "LCD16X2.h"
 #include "stdio.h"
 #include "string.h"
-#include "number2string.h"
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-#define MyLCD LCD16X2_1
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -44,10 +42,17 @@
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
-uint16_t volt_raw;
+
+UART_HandleTypeDef huart1;
+
+char msg[100];
+uint16_t volt_raw = 0;
 float voltSensor;
 float TempSensor;
-char buffer[20];
+// Definição dos coeficientes do filtro IIR
+float alpha = 0.05;  // Fator de suavização (entre 0 e 1), controle da resposta do filtro
+float y_ant = 0;    // Variável para armazenar o valor anterior da saída do filtro
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -56,8 +61,10 @@ char buffer[20];
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
-//uint32_t BP_Read_ADC(uint32_t channel);
+static void MX_USART1_UART_Init(void);
 float calcularTemperatura(float volt);
+uint32_t BP_Read_ADC(uint32_t channel);
+void EnviarMensagemSensorUART(uint16_t tensao_mV, float temperatura_C);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -97,49 +104,69 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  //Inicia o LCD
-  LCD16X2_Init(MyLCD);
-  LCD16X2_Clear(MyLCD);
-  LCD16X2_Set_Cursor(MyLCD, 1, 1);
-  LCD16X2_Write_String(MyLCD, "PROF Mozart");
-  HAL_Delay(2000);
+
   /* USER CODE END 2 */
-  HAL_ADCEx_Calibration_Start(&hadc1);
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-
-	    HAL_ADC_Start(&hadc1);
+    /*
+       HAL_ADC_Start(&hadc1);
 	    HAL_ADC_PollForConversion(&hadc1, 10);
 	    volt_raw = HAL_ADC_GetValue(&hadc1);
 	    HAL_ADC_Stop(&hadc1);
 
+      */
+
+
+
+
+	  volt_raw = BP_Read_ADC(ADC_CHANNEL_0);
+
 	  voltSensor = volt_raw*(3.3/4095); // retorna variação 0 a 3.3 volts
 	  TempSensor = calcularTemperatura(voltSensor);
+	  //**********************************************************************************************************
+	  // Implementação do filtro IIR passa-baixa
+	  // Fórmula: y[n] = alpha * x[n] + (1 - alpha) * y[n-1]
+	  float TempSensorFiltrada = alpha * TempSensor + (1 - alpha) * y_ant;
+	  // Atualiza o valor anterior da saída
+	  y_ant = TempSensorFiltrada;
+	  //**********************************************************************************************************
+	  /*
+	  HAL_UART_Transmit(&huart1, (uint8_t*)"Iniciando envio UART...\r\n", strlen("Iniciando envio UART...\r\n"), HAL_MAX_DELAY);
+
+	  // Usando sprintf para formatar texto com número inteiro
+	  sprintf(msg, "Valor ADC RAW: %d\r\n", volt_raw);
+	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
+
+	  // Usando sprintf para valor de ponto flutuante
+	  sprintf(msg, "Valor Volt: %.2f\r\n", voltSensor);
+	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
+
+	  sprintf(msg, "Valor Temp.: %.2f\r\n", TempSensor);
+	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
+
+	  sprintf(msg, "Valor Temp. Filt.: %.2f\r\n", TempSensorFiltrada);
+	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
+
+	 */
 
 
-	  LCD16X2_Clear(MyLCD);
-	  LCD16X2_Set_Cursor(MyLCD, 1, 1);
-	  LCD16X2_Write_String(MyLCD, "VOLT = ");
-	  FloatToStr(voltSensor, buffer, 2);
-	  LCD16X2_Set_Cursor(MyLCD, 1, 8);
-	  LCD16X2_Write_String(MyLCD, buffer);
 
-	  LCD16X2_Set_Cursor(MyLCD, 2, 1);
-	  LCD16X2_Write_String(MyLCD, "TEMP = ");
-	  FloatToStr(TempSensor, buffer, 2);
-	  LCD16X2_Set_Cursor(MyLCD, 2, 8);
-	  LCD16X2_Write_String(MyLCD, buffer);
+	  uint16_t miliVoltSensor = volt_raw*0.805; // retorna variação 0 a 3300 milivolts
+
+	  EnviarMensagemSensorUART(miliVoltSensor, TempSensorFiltrada); //Chama a função para receber o valor de volt e temp Sensor
 
 
+	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 	  HAL_Delay(500);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
-}//FIM DO MAIN
+}
 
 /**
   * @brief System Clock Configuration
@@ -229,27 +256,41 @@ static void MX_ADC1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
-  uint32_t BP_Read_ADC(uint32_t channel)
-  {
-    uint32_t result;
-    ADC_ChannelConfTypeDef sConfig;
 
-    sConfig.Channel = channel;
-    sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES_5;
-    sConfig.Rank = ADC_REGULAR_RANK_1;
-
-    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
-
-    HAL_ADCEx_Calibration_Start(&hadc1);
-
-    HAL_ADC_Start(&hadc1);
-    HAL_ADC_PollForConversion(&hadc1, 100);
-    result = HAL_ADC_GetValue(&hadc1);
-    HAL_ADC_Stop(&hadc1);
-
-    return result;
-  }
   /* USER CODE END ADC1_Init 2 */
+
+}
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 9600;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
 
 }
 
@@ -269,30 +310,16 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LCD_RS_Pin|LCD_EN_Pin|LCD_D4_Pin|LCD_D5_Pin
-                          |LCD_D6_Pin|LCD_D7_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : LED_Pin */
   GPIO_InitStruct.Pin = LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : LCD_RS_Pin LCD_EN_Pin LCD_D4_Pin LCD_D5_Pin
-                           LCD_D6_Pin LCD_D7_Pin */
-  GPIO_InitStruct.Pin = LCD_RS_Pin|LCD_EN_Pin|LCD_D4_Pin|LCD_D5_Pin
-                          |LCD_D6_Pin|LCD_D7_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
@@ -315,6 +342,58 @@ float calcularTemperatura(float volt) {
                 + 160.71;
     return temperatura;
 }
+
+
+uint32_t BP_Read_ADC(uint32_t channel)
+{
+  uint32_t result;
+  ADC_ChannelConfTypeDef sConfig;
+
+  sConfig.Channel = channel;
+  sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES_5;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+
+  HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+
+  HAL_ADCEx_Calibration_Start(&hadc1);
+
+  HAL_ADC_Start(&hadc1);
+  HAL_ADC_PollForConversion(&hadc1, 10);
+  result = HAL_ADC_GetValue(&hadc1);
+  HAL_ADC_Stop(&hadc1);
+
+  return result;
+}
+//**********************************************************************************************************
+void EnviarMensagemSensorUART(uint16_t tensao_mV, float temperatura_C) {
+    uint8_t mensagem[7];
+
+    // 1. Prefixo fixo
+    mensagem[0] = 0x7F;
+    mensagem[1] = 0xF0;
+
+    // 2. Tensão em mV (2 bytes)
+    mensagem[2] = (tensao_mV >> 8) & 0xFF;
+    mensagem[3] = tensao_mV & 0xFF;
+
+    // 3. Temperatura escalada para 0-65535 (2 bytes)
+    uint16_t temp_scaled = (uint16_t)(((temperatura_C + 40.0f) / 175.0f) * 65535.0f);
+    mensagem[4] = (temp_scaled >> 8) & 0xFF;
+    mensagem[5] = temp_scaled & 0xFF;
+
+    // 4. Checksum (soma dos 6 primeiros bytes)
+    uint8_t checksum = 0;
+    for (int i = 0; i < 6; i++) {
+        checksum += mensagem[i];
+    }
+    mensagem[6] = checksum;
+
+    // 5. Enviar pela UART1
+    HAL_UART_Transmit(&huart1, mensagem, 7, HAL_MAX_DELAY);
+}
+
+//**********************************************************************************************************
+
 /* USER CODE END 4 */
 
 /**
