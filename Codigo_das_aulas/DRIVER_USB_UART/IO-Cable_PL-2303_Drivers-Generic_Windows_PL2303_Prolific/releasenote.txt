@@ -1,0 +1,38 @@
+PL-2303 GPS Driver Installer, Prolific Edition
+Setup Installer Revision Note History
+=================================================
+
+System Requirement:
+  . Supports the following Windows OSes:
+	- Windows 98SE
+	- Windows ME
+	- Windows 2000 SP4
+	- Windows XP SP2 and above (32 bit)
+	- Windows Server 2003 (32 bit)
+	- Windows Vista (32 & 64 bit)
+	- Windows Server 2008 (32 & 64 bit)
+	- Windows 7 (32 & 64 bit)
+    	  NOTE: For Windows 7, please use RC build 7100 or above.
+  . USB host controller
+  . Device using PL-2303H/HX/X version chip
+ 
+
+Supported device ID and product strings:
+  . VID_067B&PID_2303 for "Prolific USB-to-Serial Comm Port"
+
+
+Release Notes:
+---------------
+PL2303 Driver Installer v1.0.1.3
+    . 98/ME Driver v2.0.0.19
+    . XP/2K/2003 (WDM Driver) v2.0.5.111
+    . Vista/7/2008 (WDF Driver) v3.3.2.105
+    . Installer & Build date: 1.0.1.3_20090319
+
+NOTE: This driver installer is ONLY for GPS devices with PL-2303 chip. 
+	
+
+
+========================================
+Prolific Technology Inc.
+http://www.prolific.com.tw
