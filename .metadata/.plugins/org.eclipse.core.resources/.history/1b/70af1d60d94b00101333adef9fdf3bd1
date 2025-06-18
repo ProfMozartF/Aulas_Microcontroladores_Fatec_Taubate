@@ -32,7 +32,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
-  HAL_ADC_Start_DMA(&hadc1, adcBuffer, 5);//Inicia o modulo do DMA
+  HAL_ADC_Start_DMA(hadc1, adcBuffer, 5);//Inicia o modulo do DMA
   __HAL_TIM_ENABLE(&htim2);
   __HAL_TIM_ENABLE(&htim3);
 	HAL_TIM_Base_Start_IT(&htim3);				// Inicializa Interrupção Timer1
