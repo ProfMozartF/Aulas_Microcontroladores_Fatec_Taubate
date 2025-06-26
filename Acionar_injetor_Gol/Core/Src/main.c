@@ -50,7 +50,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) //chamdada da interrupção exter
 	  __HAL_TIM_DISABLE(&htim2);          // Desabilita o timer
 	  __HAL_TIM_SET_COUNTER(&htim2, 0);   // Reinicia contador
 	  __HAL_TIM_ENABLE(&htim2);           // Reinicia o Timer
-
+//teste
 
 	 if((contDenteFonica)>(contDenteFonica_anterior*2))
 	 {
