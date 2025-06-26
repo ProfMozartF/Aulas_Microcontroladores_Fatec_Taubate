@@ -21,7 +21,6 @@ float tempo_de_injeção_calc; //resultado do tempo de injeção calculado
 uint8_t denteRodaFonica;
 uint32_t contDenteFonica;
 uint32_t contDenteFonica_anterior;
-float RPM;
 
 
 
@@ -39,8 +38,8 @@ static void MX_TIM3_Init(void);
 //***************************************************************************************************************************************
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   if (htim->Instance == TIM1) {
-	 HAL_GPIO_WritePin(Injetor_GPIO_Port, Injetor_Pin,GPIO_PIN_RESET); //Desliga aqui o injetor
-	  HAL_TIM_Base_Stop_IT(&htim3);
+	  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin,GPIO_PIN_RESET);
+	  HAL_TIM_Base_Stop_IT(&htim1);
   }
 }
 //***************************************************************************************************************************************
@@ -59,8 +58,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) //chamdada da interrupção exter
 	 }
 	 else
 	 {
-		 //RPM = freq Hz
-		 RPM = 1000000/contDenteFonica;
 		 denteRodaFonica++;
 		 contDenteFonica_anterior=contDenteFonica;
 
@@ -258,7 +255,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 71;//cada contador tera 1us
+  htim2.Init.Prescaler = 0;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 65535;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -310,7 +307,7 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 719;//tempo de cada contador = 10us
+  htim3.Init.Prescaler = 720;//tempo de cada contador = 10us
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim3.Init.Period = 65535;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
