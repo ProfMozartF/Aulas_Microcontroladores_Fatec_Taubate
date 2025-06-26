@@ -38,7 +38,7 @@ static void MX_TIM3_Init(void);
 
 //***************************************************************************************************************************************
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-  if (htim->Instance == TIM1) {
+  if (htim->Instance == TIM3) {
 	 HAL_GPIO_WritePin(Injetor_GPIO_Port, Injetor_Pin,GPIO_PIN_RESET); //Desliga aqui o injetor
 	  HAL_TIM_Base_Stop_IT(&htim3);
   }

@@ -1,0 +1,45 @@
+!SESSION 2025-06-25 21:23:00.214 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\sourcetree ubatuba\Acionar_injetor_Gol
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-06-25 21:23:06.392
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-06-25 21:23:06.394
+!MESSAGE Log4j2 initialized with config file C:\sourcetree ubatuba\Acionar_injetor_Gol\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-06-25 21:23:09.996
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2025-06-25 21:24:04.416 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\sourcetree ubatuba\Acionar_injetor_Gol
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-06-25 21:24:09.656
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-06-25 21:24:09.658
+!MESSAGE Log4j2 initialized with config file C:\sourcetree ubatuba\Acionar_injetor_Gol\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-06-25 21:24:12.962
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2025-06-25 21:26:59.543 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=pt_BR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\sourcetree ubatuba\Acionar_injetor_Gol
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-06-25 21:27:04.687
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-06-25 21:27:04.689
+!MESSAGE Log4j2 initialized with config file C:\sourcetree ubatuba\Acionar_injetor_Gol\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-06-25 21:27:07.855
+!MESSAGE Started RMI Server, listening on port 41337

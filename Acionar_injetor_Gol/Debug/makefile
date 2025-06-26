@@ -63,8 +63,8 @@ all: main-build
 main-build: Acionar_injetor_Gol.elf secondary-outputs
 
 # Tool invocations
-Acionar_injetor_Gol.elf Acionar_injetor_Gol.map: $(OBJS) $(USER_OBJS) C:\GIT\CODIGO_TRAB_FINAL\Acionar_injetor_Gol\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Acionar_injetor_Gol.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\GIT\CODIGO_TRAB_FINAL\Acionar_injetor_Gol\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Acionar_injetor_Gol.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Acionar_injetor_Gol.elf Acionar_injetor_Gol.map: $(OBJS) $(USER_OBJS) C:\sourcetree\ ubatuba\Acionar_injetor_Gol\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Acionar_injetor_Gol.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\sourcetree ubatuba\Acionar_injetor_Gol\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Acionar_injetor_Gol.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
