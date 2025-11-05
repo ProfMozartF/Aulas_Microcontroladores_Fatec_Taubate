@@ -18,8 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stdio.h"
-#include "string.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -45,14 +44,6 @@ ADC_HandleTypeDef hadc1;
 
 UART_HandleTypeDef huart1;
 
-char msg[100];
-uint16_t volt_raw = 0;
-float voltSensor;
-float TempSensor;
-// Definição dos coeficientes do filtro IIR
-float alpha = 0.05;  // Fator de suavização (entre 0 e 1), controle da resposta do filtro
-float y_ant = 0;    // Variável para armazenar o valor anterior da saída do filtro
-
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -62,9 +53,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_USART1_UART_Init(void);
-float calcularTemperatura(float volt);
-uint32_t BP_Read_ADC(uint32_t channel);
-void EnviarMensagemSensorUART(uint16_t tensao_mV, float temperatura_C);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -113,56 +101,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /*
-       HAL_ADC_Start(&hadc1);
-	    HAL_ADC_PollForConversion(&hadc1, 10);
-	    volt_raw = HAL_ADC_GetValue(&hadc1);
-	    HAL_ADC_Stop(&hadc1);
+    /* USER CODE END WHILE */
 
-      */
-
-
-
-
-	  volt_raw = BP_Read_ADC(ADC_CHANNEL_0);
-
-	  voltSensor = volt_raw*(3.3/4095); // retorna variação 0 a 3.3 volts
-	  TempSensor = calcularTemperatura(voltSensor);
-	  //**********************************************************************************************************
-	  // Implementação do filtro IIR passa-baixa
-	  // Fórmula: y[n] = alpha * x[n] + (1 - alpha) * y[n-1]
-	  float TempSensorFiltrada = alpha * TempSensor + (1 - alpha) * y_ant;
-	  // Atualiza o valor anterior da saída
-	  y_ant = TempSensorFiltrada;
-	  //**********************************************************************************************************
-	  /*
-	  HAL_UART_Transmit(&huart1, (uint8_t*)"Iniciando envio UART...\r\n", strlen("Iniciando envio UART...\r\n"), HAL_MAX_DELAY);
-
-	  // Usando sprintf para formatar texto com número inteiro
-	  sprintf(msg, "Valor ADC RAW: %d\r\n", volt_raw);
-	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
-
-	  // Usando sprintf para valor de ponto flutuante
-	  sprintf(msg, "Valor Volt: %.2f\r\n", voltSensor);
-	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
-
-	  sprintf(msg, "Valor Temp.: %.2f\r\n", TempSensor);
-	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
-
-	  sprintf(msg, "Valor Temp. Filt.: %.2f\r\n", TempSensorFiltrada);
-	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
-
-	 */
-
-
-
-	  uint16_t miliVoltSensor = volt_raw*0.805; // retorna variação 0 a 3300 milivolts
-
-	  EnviarMensagemSensorUART(miliVoltSensor, TempSensorFiltrada); //Chama a função para receber o valor de volt e temp Sensor
-
-
-	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-	  HAL_Delay(500);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -327,23 +267,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-float calcularTemperatura(float volt) {
-    float volt2 = volt * volt;
-    float volt3 = volt2 * volt;
-    float volt4 = volt3 * volt;
-    float volt5 = volt4 * volt;
-
-    float temperatura;
-    temperatura = -7.0343 * volt5
-                + 62.113 * volt4
-                - 211.03 * volt3
-                + 344.26 * volt2
-                - 303.17 * volt
-                + 160.71;
-    return temperatura;
-}
-
-
+//**********************************************************************************************************
 uint32_t BP_Read_ADC(uint32_t channel)
 {
   uint32_t result;
@@ -365,35 +289,6 @@ uint32_t BP_Read_ADC(uint32_t channel)
   return result;
 }
 //**********************************************************************************************************
-void EnviarMensagemSensorUART(uint16_t tensao_mV, float temperatura_C) {
-    uint8_t mensagem[7];
-
-    // 1. Prefixo fixo
-    mensagem[0] = 0x7F;
-    mensagem[1] = 0xF0;
-
-    // 2. Tensão em mV (2 bytes)
-    mensagem[2] = (tensao_mV >> 8) & 0xFF;
-    mensagem[3] = tensao_mV & 0xFF;
-
-    // 3. Temperatura escalada para 0-65535 (2 bytes)
-    uint16_t temp_scaled = (uint16_t)(((temperatura_C + 40.0f) / 175.0f) * 65535.0f);
-    mensagem[4] = (temp_scaled >> 8) & 0xFF;
-    mensagem[5] = temp_scaled & 0xFF;
-
-    // 4. Checksum (soma dos 6 primeiros bytes)
-    uint8_t checksum = 0;
-    for (int i = 0; i < 6; i++) {
-        checksum += mensagem[i];
-    }
-    mensagem[6] = checksum;
-
-    // 5. Enviar pela UART1
-    HAL_UART_Transmit(&huart1, mensagem, 7, HAL_MAX_DELAY);
-}
-
-//**********************************************************************************************************
-
 /* USER CODE END 4 */
 
 /**

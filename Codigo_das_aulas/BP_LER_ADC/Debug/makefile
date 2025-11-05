@@ -63,8 +63,8 @@ all: main-build
 main-build: BP_LER_ADC.elf secondary-outputs
 
 # Tool invocations
-BP_LER_ADC.elf BP_LER_ADC.map: $(OBJS) $(USER_OBJS) C:\GIT\Microcontroladores\Codigo_das_aulas\BP_LER_ADC\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "BP_LER_ADC.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\GIT\Microcontroladores\Codigo_das_aulas\BP_LER_ADC\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="BP_LER_ADC.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+BP_LER_ADC.elf BP_LER_ADC.map: $(OBJS) $(USER_OBJS) C:\GIT\AULASFATEC_2025_1\Codigo_das_aulas\BP_LER_ADC\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "BP_LER_ADC.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\GIT\AULASFATEC_2025_1\Codigo_das_aulas\BP_LER_ADC\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="BP_LER_ADC.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfloat-abi=soft -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
